@@ -1,25 +1,42 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react'; // Add useContext here
+import { Link, useNavigate } from 'react-router-dom';
+import { userDataContext } from '../context/userContext'; // Import the context
+import axios from 'axios';
 
 const UserSignup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [userData, setUserData] = useState({});
+  const [firstname, setFirstName] = useState('');
+  const [lastname, setLastName] = useState('');
+  const navigate = useNavigate();
+  const { user, setUser } = useContext(userDataContext); // Use the context here
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
     const newUser = {
       email: email,
       password: password,
-      username: {
-        firstName: firstName,
-        lastName: lastName,
+      fullname: {
+        firstname: firstname,
+        lastname: lastname,
       },
     };
-    setUserData(newUser);
-    console.log("User Signup:", newUser);
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/users/register`,
+        newUser
+      );
+      if (response.status === 201) {
+        console.log(response.data);
+        const data = response.data;
+        setUser(data.user);
+                localStorage.setItem('token', data.token);
+        navigate('/home');
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
     // Clear the form inputs
     setEmail('');
@@ -36,13 +53,15 @@ const UserSignup = () => {
 
           {/* Name Inputs */}
           <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">What is your name?</label>
+            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+              What is your name?
+            </label>
             <div className="flex gap-4">
               <input
                 id="firstName"
                 type="text"
                 placeholder="First Name"
-                value={firstName}
+                value={firstname}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
                 className="mt-1 block w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
@@ -51,7 +70,7 @@ const UserSignup = () => {
                 id="lastName"
                 type="text"
                 placeholder="Last Name"
-                value={lastName}
+                value={lastname}
                 onChange={(e) => setLastName(e.target.value)}
                 required
                 className="mt-1 block w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
@@ -61,7 +80,9 @@ const UserSignup = () => {
 
           {/* Email Input */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">What is your email?</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              What is your email?
+            </label>
             <input
               id="email"
               type="email"
@@ -75,7 +96,9 @@ const UserSignup = () => {
 
           {/* Password Input */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Enter Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Enter Password
+            </label>
             <input
               id="password"
               type="password"

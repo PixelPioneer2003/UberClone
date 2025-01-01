@@ -14,7 +14,7 @@ const CaptainSignup = () => {
     const newCaptain = {
       email: email,
       password: password,
-      username: {
+      fullName: {
         firstName: firstName,
         lastName: lastName,
       },
