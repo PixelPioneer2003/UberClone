@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/captain", captainRoutes);
+app.use("/api/v1/captains", captainRoutes);
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });

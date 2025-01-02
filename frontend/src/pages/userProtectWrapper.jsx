@@ -1,5 +1,6 @@
 import React from 'react'
-import { useNavigate,useEffect } from 'react-router-dom'
+import { useNavigate} from 'react-router-dom'
+import { useEffect } from 'react'
 
 const userProtectWrapper = ({children}) => {
     const navigate=useNavigate()
@@ -11,6 +12,7 @@ const userProtectWrapper = ({children}) => {
     }, [token])
   return (
     <>
+    {children}
     </>
   )
 }

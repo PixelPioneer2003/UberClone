@@ -1,34 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-
+import { CaptainDataContext } from '../context/CaptainContext';
+import axios from 'axios';
+import { useNavigate} from 'react-router-dom';
 const CaptainSignup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [licenseNumber, setLicenseNumber] = useState('');
-  const [userData, setUserData] = useState({});
+  const [vehicleColor, setVehicleColor] = useState('');
+  const [vehiclePlate, setVehiclePlate] = useState('');
+  const [vehicleCapacity, setVehicleCapacity] = useState(0);
+  const [vehicleType, setVehicleType] = useState('');
+   const navigate = useNavigate();
+// In CaptainSignup.jsx
+const { captain, updateCaptain } = useContext(CaptainDataContext);
 
-  const submitHandler = (e) => {
+  const submitHandler =  async (e) => {
     e.preventDefault();
     const newCaptain = {
       email: email,
       password: password,
-      fullName: {
-        firstName: firstName,
-        lastName: lastName,
+      fullname: {
+        firstname: firstName,
+        lastname: lastName,
       },
-      licenseNumber: licenseNumber,
+      vehicle: {
+        color: vehicleColor,
+        plate: vehiclePlate,
+        capacity: vehicleCapacity,
+        vehicleType: vehicleType,
+      },
     };
-    setUserData(newCaptain);
-    console.log("Captain Signup:", newCaptain);
-
-    // Clear the form inputs
+   try{
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/captains/register`,
+        newCaptain
+      );
+      if(response.status === 201){
+        console.log(response.data);
+        const data = response.data;
+        updateCaptain(data.captain);
+        localStorage.setItem('token', data.token);
+        navigate('/captain-home');
+      }
+   }catch(error){
+      console.log(error);
+      }
     setEmail('');
     setPassword('');
     setFirstName('');
     setLastName('');
-    setLicenseNumber('');
+    setVehicleColor('');
+    setVehiclePlate('');
+    setVehicleCapacity(0);
+    setVehicleType('');
   };
 
   return (
@@ -90,15 +116,50 @@ const CaptainSignup = () => {
             />
           </div>
 
-          {/* License Number Input */}
+          {/* Vehicle Details Inputs */}
           <div>
-            <label htmlFor="licenseNumber" className="block text-sm font-medium text-gray-700">Enter License Number</label>
+            <h4 className="text-lg font-semibold">Vehicle Details</h4>
+
+            <label htmlFor="vehicleColor" className="block text-sm font-medium text-gray-700">Vehicle Color</label>
             <input
-              id="licenseNumber"
+              id="vehicleColor"
               type="text"
-              placeholder="License Number"
-              value={licenseNumber}
-              onChange={(e) => setLicenseNumber(e.target.value)}
+              placeholder="Vehicle Color"
+              value={vehicleColor}
+              onChange={(e) => setVehicleColor(e.target.value)}
+              required
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            />
+
+            <label htmlFor="vehiclePlate" className="block text-sm font-medium text-gray-700">Vehicle Plate Number</label>
+            <input
+              id="vehiclePlate"
+              type="text"
+              placeholder="Vehicle Plate Number"
+              value={vehiclePlate}
+              onChange={(e) => setVehiclePlate(e.target.value)}
+              required
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            />
+
+            <label htmlFor="vehicleCapacity" className="block text-sm font-medium text-gray-700">Vehicle Capacity</label>
+            <input
+              id="vehicleCapacity"
+              type="number"
+              placeholder="Vehicle Capacity"
+              value={vehicleCapacity}
+              onChange={(e) => setVehicleCapacity(e.target.value)}
+              required
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            />
+
+            <label htmlFor="vehicleType" className="block text-sm font-medium text-gray-700">Vehicle Type</label>
+            <input
+              id="vehicleType"
+              type="text"
+              placeholder="Vehicle Type"
+              value={vehicleType}
+              onChange={(e) => setVehicleType(e.target.value)}
               required
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
             />
