@@ -30,8 +30,21 @@ const Home = () => {
     const [ activeField, setActiveField ] = useState(null)
     const [ fare, setFare ] = useState({})
     const [ vehicleType, setVehicleType ] = useState(null)
+    const[ride,setRide]=useState(null);
    const {socket} = useContext(SocketContext);
    const{user}=useContext(userDataContext);
+   
+    socket.on("ride-confirmed", (ride) => {
+        console.log("ride-confirmed", ride);
+        setRide(ride);
+        setWaitingForDriver(true);
+   });
+    socket.on('ride-started', ride => {
+        console.log("ride")
+        setWaitingForDriver(false)
+        navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
+    })
+
   useEffect(() => {
     if (user?._id) {
         console.log(`${user._id} user`);
@@ -52,7 +65,36 @@ const Home = () => {
         }
     }
 }, [user]);
-
+    
+     async function findTrip() {
+        setVehiclePanel(true)
+        setPanelOpen(false)
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/get-fare`, {
+            params: { pickup, destination },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+        console.log(response.data)
+        setFare(response.data)
+    }
+    async function createRide() {
+        try{
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
+            pickup,
+            destination,
+            vehicleType
+        }, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+        console.log(response.data)
+    } catch(error) {
+        console.log(error);
+        // handle error
+        }
+    }
     const handlePickupChange = async (e) => {
         setPickup(e.target.value)
         try {
@@ -158,35 +200,7 @@ const Home = () => {
             })
         }
     }, [ waitingForDriver ])
-    async function findTrip() {
-        setVehiclePanel(true)
-        setPanelOpen(false)
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/get-fare`, {
-            params: { pickup, destination },
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-        })
-        console.log(response.data)
-        setFare(response.data)
-    }
-    async function createRide() {
-        try{
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
-            pickup,
-            destination,
-            vehicleType
-        }, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-        })
-        console.log(response.data)
-    } catch(error) {
-        console.log(error);
-        // handle error
-        }
-    }
+   
 
     return (
         <div className='h-screen relative overflow-hidden'>
@@ -270,7 +284,7 @@ const Home = () => {
                     setVehicleFound={setVehicleFound} />
             </div>
             <div ref={waitingForDriverRef} className='fixed w-full  z-10 bottom-0  bg-white px-3 py-6 pt-12'>
-                <WaitingForDriver waitingForDriver={waitingForDriver} />
+                <WaitingForDriver  ride={ride} waitingForDriver={waitingForDriver} />
             </div>
         </div>
     )

@@ -7,6 +7,7 @@ module.exports.createRide = async (
   destination,
   vehicleType
 ) => {
+  console.log("in services");
   console.log(userId, pickup, destination, vehicleType);
 
   // Validate required fields
@@ -15,7 +16,7 @@ module.exports.createRide = async (
   }
 
   // Calculate fare
-  const fare = await getFare(pickup, destination);
+  const fare = await module.exports.getFare(pickup, destination);
   console.log("Fare:", fare);
 
   // Check if the vehicleType is valid
@@ -88,4 +89,57 @@ module.exports.getFare = async (pickup, destination) => {
   console.log("Fare:", fare);
 
   return fare;
+};
+
+module.exports.confirmRide = async (rideId, captain) => {
+  if (!rideId) {
+    throw new Error("Please provide rideId");
+  }
+
+  const ride = await rideModel
+    .findOneAndUpdate(
+      { _id: rideId },
+      { status: "accepted", captain: captain._id },
+      { new: true }
+    )
+    .populate("user")
+    .populate("captain")
+    .select("+otp");
+  if (!ride) {
+    throw new Error("Ride not found");
+  }
+  return ride;
+};
+
+module.exports.startRide = async (rideId, otp, captain) => {
+  if (!rideId || !otp) {
+    throw new Error("Please provide rideId and OTP");
+  }
+
+  const ride = await rideModel
+    .findOne({ _id: rideId })
+    .populate("captain")
+    .populate("user")
+    .select("+otp");
+  if (!ride) {
+    throw new Error("no SUCH RIDE OTP");
+  }
+  if (ride.status !== "accepted") {
+    throw new Error("Ride not accepted");
+  }
+
+  if (ride.otp !== otp) {
+    throw new Error("Invalid OTP");
+  }
+
+  await rideModel.findOneAndUpdate(
+    {
+      _id: rideId,
+    },
+    {
+      status: "ongoing",
+    }
+  );
+
+  return ride;
 };

@@ -19,8 +19,8 @@ module.exports.getAddressCoordinate = async (address) => {
     }
 
     // Extract latitude and longitude from the first result
-    const { latitude: lat, longitude: lng } = results[0];
-    return { lat, lng };
+    const { latitude: ltd, longitude: lng } = results[0];
+    return { ltd, lng };
   } catch (error) {
     console.error(
       "Error fetching coordinates:",
@@ -136,6 +136,20 @@ module.exports.getAutoCompleteSuggestions = async (input) => {
 module.exports.getCaptainsInTheRadius = async (ltd, lng, radius) => {
   // radius in km
 
+  const captains = await captainModel.find({
+    location: {
+      $geoWithin: {
+        $centerSphere: [[ltd, lng], radius / 6371],
+      },
+    },
+  });
+
+  return captains;
+};
+
+module.exports.getCaptainsInTheRadius = async (ltd, lng, radius) => {
+  // radius in km
+  //find outall the captain with in given radius
   const captains = await captainModel.find({
     location: {
       $geoWithin: {
