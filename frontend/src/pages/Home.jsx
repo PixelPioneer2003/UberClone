@@ -8,7 +8,9 @@ import VehiclePanel from '../components/VehiclePanel';
 import ConfirmRide from '../components/ConfirmRide';
 import LookingForDriver from '../components/LookingForDriver';
 import WaitingForDriver from '../components/WaitingForDriver';
-
+import {SocketContext} from '../context/SocketContext';
+import {useContext, useEffect} from 'react';
+import { userDataContext } from '../context/userContext'; // Import the context
 const Home = () => {
     const [ pickup, setPickup ] = useState('')
     const [ destination, setDestination ] = useState('')
@@ -28,6 +30,28 @@ const Home = () => {
     const [ activeField, setActiveField ] = useState(null)
     const [ fare, setFare ] = useState({})
     const [ vehicleType, setVehicleType ] = useState(null)
+   const {socket} = useContext(SocketContext);
+   const{user}=useContext(userDataContext);
+  useEffect(() => {
+    if (user?._id) {
+        console.log(`${user._id} user`);
+
+        try {
+            // Emit the join event
+            socket.emit("join", {
+                userType: "user",
+                userId: user._id,
+            });
+
+            // Handle potential errors from the server
+            socket.on("error", (err) => {
+                console.error("Socket error:", err);
+            });
+        } catch (error) {
+            console.error("Error in socket.emit:", error);
+        }
+    }
+}, [user]);
 
     const handlePickupChange = async (e) => {
         setPickup(e.target.value)

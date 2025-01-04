@@ -1,4 +1,5 @@
 const userModel = require("../models/user.model");
+const captainModel = require("../models/captain.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const BlacklistTokenModel = require("../models/blacklistToken.model");
@@ -39,7 +40,13 @@ module.exports.authUser = async (req, res, next) => {
 };
 
 module.exports.authCaptain = async (req, res, next) => {
-  const token = req.cookies.token || req.header.authorization.split(" ")[1];
+  const authHeader = req.headers.authorization;
+  console.log("authHeader", authHeader);
+  if (!authHeader) {
+    return res.status(401).json({ message: "Authorization header is missing" });
+  }
+  const token = req.cookies.token || authHeader.split(" ")[1];
+  console.log("token", token);
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -56,6 +63,7 @@ module.exports.authCaptain = async (req, res, next) => {
     req.captain = captain;
     return next();
   } catch (error) {
+    console.error("JWT Verification Error:", error.message);
     return res.status(401).json({ message: "Unauthorized" });
   }
 };

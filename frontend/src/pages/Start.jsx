@@ -1,19 +1,19 @@
-import React from 'react';
-import Uber_logo from '../assets/Uber_logo.png' // Import the image
-import { Link } from 'react-router-dom';
-// frontend\src\assets\Uber_logo.png
+
+import React from 'react'
+import { Link } from 'react-router-dom'
+
 const Start = () => {
   return (
     <div>
-      <div className='bg-cover bg-bottom bg-[url(https://media.istockphoto.com/id/1888768110/photo/a-traffic-light-and-flag-of-germany.webp?a=1&b=1&s=612x612&w=0&k=20&c=LbeKmE9vIBJKHWcLgYR2KoBHRUueyH8L6qtQWTmfbTk=)] h-screen pt-5 flex justify-between flex-col w-full bg-red-400'>
-        <img  className='w-14 ml-8' src={Uber_logo} alt='Uber_logo' /> 
-        <div className='bg-white py-5 px-10'>
-          <h2 className='text-2xl font-bold'>Get Started with Uber</h2>
-          <Link to='/login'className='inline-block w-full bg-black text-white py-3 rounded mt-4'>Continue</Link>
+      <div className='bg-cover bg-center bg-[url(https://images.unsplash.com/photo-1619059558110-c45be64b73ae?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] h-screen pt-8 flex justify-between flex-col w-full'>
+        <img className='w-16 ml-8' src="https://cdn-assets-eu.frontify.com/s3/frontify-enterprise-files-eu/eyJwYXRoIjoid2VhcmVcL2ZpbGVcLzhGbTh4cU5SZGZUVjUxYVh3bnEyLnN2ZyJ9:weare:F1cOF9Bps96cMy7r9Y2d7affBYsDeiDoIHfqZrbcxAw?width=1200&height=417" alt="" />
+        <div className='bg-white pb-8 py-4 px-4'>
+          <h2 className='text-[30px] font-semibold'>Get Started with Uber</h2>
+          <Link to='/login' className='flex items-center justify-center w-full bg-black text-white py-3 rounded-lg mt-5'>Continue</Link>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Start;
+export default Start

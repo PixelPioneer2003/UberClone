@@ -51,10 +51,29 @@ module.exports.loginUser = async (req, res, next) => {
   });
   res.status(200).json({ user, token });
 };
-module.exports.getUserProfile = async (req, res, next) => {};
+module.exports.getUserProfile = async (req, res, next) => {
+  res.status(200).json(req.user);
+};
+
 module.exports.logoutUser = async (req, res, next) => {
-  const token = req.cookies.token || req.header.authorization.split(" ")[1];
-  res.clearCookie("token");
-  await BlacklistTokenModel.create({ token });
-  res.status(200).json({ message: "Logged out" });
+  console.log("logoutUser");
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      console.log("Authorization header is missing");
+    }
+
+    const token = req.cookies.token || authHeader.split(" ")[1];
+    console.log(token + "token");
+    if (!token) {
+      console.log("Token missing");
+    }
+    res.clearCookie("token");
+    await BlacklistTokenModel.create({ token });
+    res.status(200).json({ message: "Logged out" });
+  } catch (error) {
+    console.log("logout user error");
+    console.log(error);
+  }
 };

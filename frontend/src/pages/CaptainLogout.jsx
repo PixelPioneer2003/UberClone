@@ -1,25 +1,25 @@
-import React, { useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
-const UserLogout = () => {
-    const navigate = useNavigate();
+import React from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+const CaptainLogout = () => {
+   const navigate = useNavigate();
 
     useEffect(() => {
-        console.log('UserLogout');
+        console.log('Captain Logout');
         const token = localStorage.getItem('token');
         console.log(token);
         // Make the API call for logout
-     axios.get(`${import.meta.env.VITE_BASE_URL}/users/logout`, {
+     axios.get(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((res) => {
                 if (res.status === 200) {
-                    console.log('User logged out');
+                    console.log('Captain logged out');
                     localStorage.removeItem('token');
-                    navigate('/login');
+                    navigate('/captain-login');
                 }
             })
             .catch((error) => {
@@ -28,7 +28,8 @@ const UserLogout = () => {
             });
     }, []); // Dependency array ensures it runs only once on mount
 
-    return <div>UserLogout</div>;
-};
+    return <div>CaptainLogout</div>;
+}
 
-export default UserLogout;
+
+export default CaptainLogout

@@ -3,6 +3,8 @@ const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
 const port = process.env.PORT || 4000;
+const http = require("http");
+const { initializeSocket } = require("./socket");
 
 const cors = require("cors");
 const dbConnect = require("./config/Database");
@@ -25,6 +27,10 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 // Start the server
-app.listen(port, () => {
-  console.log(`Server started on port ${port}`);
+const server = http.createServer(app);
+initializeSocket(server);
+
+// Start the server
+server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
