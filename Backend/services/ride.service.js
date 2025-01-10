@@ -7,7 +7,6 @@ module.exports.createRide = async (
   destination,
   vehicleType
 ) => {
-  console.log("in services");
   console.log(userId, pickup, destination, vehicleType);
 
   // Validate required fields
@@ -35,6 +34,12 @@ module.exports.createRide = async (
 
   return ride;
 };
+function getOtp(num) {
+  const otp = crypto
+    .randomInt(Math.pow(10, num - 1), Math.pow(10, num) - 1)
+    .toString();
+  return otp;
+}
 function getOtp(num) {
   const otp = crypto
     .randomInt(Math.pow(10, num - 1), Math.pow(10, num) - 1)
@@ -86,7 +91,7 @@ module.exports.getFare = async (pickup, destination) => {
     ),
   };
 
-  console.log("Fare:", fare);
+  // console.log("Fare:", fare);
 
   return fare;
 };
@@ -95,19 +100,24 @@ module.exports.confirmRide = async (rideId, captain) => {
   if (!rideId) {
     throw new Error("Please provide rideId");
   }
-
+  console.log("confirm ride in serviices");
+  console.log("ride id" + rideId);
+  console.log(captain);
   const ride = await rideModel
     .findOneAndUpdate(
       { _id: rideId },
-      { status: "accepted", captain: captain._id },
+      { status: "accepted", captain: captain },
       { new: true }
     )
     .populate("user")
     .populate("captain")
     .select("+otp");
+  console.log("printing the ride in cofirm ride");
+  console.log(ride);
   if (!ride) {
     throw new Error("Ride not found");
   }
+  console.log("ride confirmed in backend");
   return ride;
 };
 
@@ -115,7 +125,7 @@ module.exports.startRide = async (rideId, otp, captain) => {
   if (!rideId || !otp) {
     throw new Error("Please provide rideId and OTP");
   }
-
+  console.log("start ride services");
   const ride = await rideModel
     .findOne({ _id: rideId })
     .populate("captain")
@@ -138,6 +148,41 @@ module.exports.startRide = async (rideId, otp, captain) => {
     },
     {
       status: "ongoing",
+    }
+  );
+  console.log(ride);
+
+  return ride;
+};
+
+module.exports.endRide = async ({ rideId, captain }) => {
+  if (!rideId) {
+    throw new Error("Ride id is required");
+  }
+
+  const ride = await rideModel
+    .findOne({
+      _id: rideId,
+      captain: captain._id,
+    })
+    .populate("user")
+    .populate("captain")
+    .select("+otp");
+
+  if (!ride) {
+    throw new Error("Ride not found");
+  }
+
+  if (ride.status !== "ongoing") {
+    throw new Error("Ride not ongoing");
+  }
+
+  await rideModel.findOneAndUpdate(
+    {
+      _id: rideId,
+    },
+    {
+      status: "completed",
     }
   );
 

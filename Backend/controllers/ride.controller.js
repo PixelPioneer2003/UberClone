@@ -73,14 +73,17 @@ module.exports.confirmRide = async (req, res, next) => {
       console.log("Errors", errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
-    const { rideId } = req.body;
+    const { rideId, captainId } = req.body;
     console.log("rideId", rideId);
-    const captain = req.captain;
-    const ride = await rideService.confirmRide(rideId, captain);
+    console.log("finding oout captain");
+    console.log(captainId);
+    const ride = await rideService.confirmRide(rideId, captainId);
+    console.log("socket id " + ride.user.socketId);
     sendMessageToSocketId(ride.user.socketId, {
       event: "ride-confirmed",
       data: ride,
     });
+    console.log("somethng something");
     res.status(200).json(ride);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -89,6 +92,7 @@ module.exports.confirmRide = async (req, res, next) => {
 
 module.exports.startRide = async (req, res, next) => {
   try {
+    console.log("at start ride ..");
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log("Errors", errors.array());
@@ -107,4 +111,29 @@ module.exports.startRide = async (req, res, next) => {
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
+};
+
+module.exports.endRide = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { rideId } = req.body;
+
+  try {
+    console.log(req.captain);
+    console.log("printig the ecaptan in ");
+    const ride = await rideService.endRide({ rideId, captain: req.captain });
+
+    sendMessageToSocketId(ride.user.socketId, {
+      event: "ride-ended",
+      data: ride,
+    });
+
+    return res.status(200).json(ride);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+  s;
 };

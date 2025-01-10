@@ -6,23 +6,29 @@ const ConfirmRidePopUp = (props) => {
     const [otp, setOtp] = useState('')
     const navigate = useNavigate()
     const submitHandler = async (e)=>{
-        e.preventDetault()
+        e.preventDefault()
+        try{
+            console.log("confirm ride start pop up");
+           const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/start-ride`, {
+               params: {
+                   rideId: props.ride._id,
+                   otp: otp
+               },
+               headers: {
+                   Authorization: `Bearer ${localStorage.getItem('token')}`
+               }
+           })
 
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/start-ride`, {
-            params: {
-                rideId: props.ride._id,
-                otp: otp
-            },
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-        })
-
-        if (response.status === 200) {
-            props.setConfirmRidePopupPanel(false)
-            props.setRidePopupPanel(false)
-            navigate('/captain-riding', { state: { ride: props.ride } })
+           if (response.status === 200) {
+               props.setConfirmRidePopupPanel(false)
+               props.setRidePopupPanel(false)
+               navigate('/captain-riding', { state: { ride: props.ride } })
+           }
         }
+        catch(error){
+            console.log(error);
+        }
+
     }
     return (
         <div>
@@ -62,11 +68,9 @@ const ConfirmRidePopUp = (props) => {
                     </div>
                 </div>
                 <div className='mt-6 w-full'>
-                    <form onSubmit={(e)=>{
-                        submitHandler(e)
-                    }}>
+                    <form onSubmit={submitHandler}>
                         <input value={otp} onChange={(e)=>setOtp(e.target.value)} type="text" className='bg-[#eee] px-6 py-4 font-mono text-lg rounded-lg w-full mt-3' placeholder='Enter OTP' />
-                    <button to='/captain-riding'  className='w-full mt-5 text-lg flex justify-center bg-green-600 text-white font-semibold p-3 rounded-lg'>Confirm</button>
+                    <button  className='w-full mt-5 text-lg flex justify-center bg-green-600 text-white font-semibold p-3 rounded-lg'>Confirm</button>
                     <button onClick={() => {
                         props.setConfirmRidePopupPanel(false)
                         props.setRidePopupPanel(false)

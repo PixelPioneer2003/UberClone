@@ -10,7 +10,9 @@ import LookingForDriver from '../components/LookingForDriver';
 import WaitingForDriver from '../components/WaitingForDriver';
 import {SocketContext} from '../context/SocketContext';
 import {useContext, useEffect} from 'react';
-import { userDataContext } from '../context/userContext'; // Import the context
+import { userDataContext } from '../context/userContext'; 
+import { useNavigate } from 'react-router-dom';
+// Import the context
 const Home = () => {
     const [ pickup, setPickup ] = useState('')
     const [ destination, setDestination ] = useState('')
@@ -33,6 +35,7 @@ const Home = () => {
     const[ride,setRide]=useState(null);
    const {socket} = useContext(SocketContext);
    const{user}=useContext(userDataContext);
+    const navigate = useNavigate()
    
     socket.on("ride-confirmed", (ride) => {
         console.log("ride-confirmed", ride);
@@ -40,7 +43,7 @@ const Home = () => {
         setWaitingForDriver(true);
    });
     socket.on('ride-started', ride => {
-        console.log("ride")
+        console.log("ride started");
         setWaitingForDriver(false)
         navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
     })
